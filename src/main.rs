@@ -2,10 +2,11 @@
 // RANK - 2 through 10 then Joker, Queen, and King. The numeric value of a card
 // SUIT - Spades, Hearts, Diamons, or Clubs. The symbol of the card
 
-use std::fmt;
+use std::{fmt, intrinsics::mir::Len};
 
 
 // suites in american order ranking
+#[derive(Copy, Clone)]
 enum Suit {
     Spades,
     Hearts,
@@ -25,6 +26,7 @@ impl fmt::Display for Suit {
     }
 }
 
+#[derive(Copy, Clone)]
 enum Rank {
     Ace,
     King,
@@ -58,8 +60,11 @@ struct Deck {
 impl Default for Deck {
     fn default() -> Self {
         let mut cards = Vec::with_capacity(52);
-        for &suit in &[Suit::Clubs, Suit::Diamonds, Suit::Hearts, Suit::Spades] {
-            for &rank in &[Rank::Ace, Rank::King, Rank::Queen, Rank::Jack] {
+        let Suits = [Suit::Spades, Suit::Diamonds, Suit::Hearts, Suit::Clubs];
+        let Ranks = [Rank::Ace, Rank::King, Rank::Queen, Rank::Jack];
+
+        for &suit in Suits.iter() {
+            for &rank in Ranks.iter() {
                 cards.push(Card { suit, rank });
             }
             for rank in (2..11).map(|value| Rank::Value(value)) {
@@ -70,13 +75,66 @@ impl Default for Deck {
         Deck { cards }
     }
 }
-fn print_deck(deck: Deck) {
 
+fn shuffle_deck(deck: Deck) {
+    let passes = 3;
+    let mut rng = thread_rng();
+    rng.shuffle(deck.cards);
+}
+
+fn print_deck(deck: Deck) {
     for card in deck.cards {
-        println!("{suit}{rank}", suit=card.suit, rank=card.rank);
+        println!("{rank}{suit}", suit=card.suit, rank=card.rank);
+
+        //print_card(card);
     }
 }
 
+fn print_card(card: Card) {
+    println!("┌─────────┐");
+    if card.rank.to_string() == "10" {
+        println!("│ {rank}      │", rank=card.rank);
+    } else {
+        println!("│  {rank}      │", rank=card.rank);
+    }
+    println!("│         │");
+    println!("│         │");
+    println!("│    {suit}    │", suit=card.suit);
+    println!("│         │");
+    println!("│         │");
+    if card.rank.to_string() == "10" {
+        println!("│      {rank} │", rank=card.rank);
+    } else {
+        println!("│     {rank}   │", rank=card.rank);
+    }
+    println!("└─────────┘");
+}
+
+fn print_cards(cards: Vec<Card>) {
+    let cardsize = cards.len();
+
+    let mut topstring: String;
+    for i in 0..cardsize {
+        topstring.push('-');
+    }
+    print!("┌─────────┐");
+    if card.rank.to_string() == "10" {
+        println!("│ {rank}      │", rank=card.rank);
+    } else {
+        println!("│  {rank}      │", rank=card.rank);
+    }
+    println!("│         │");
+    println!("│         │");
+    println!("│    {suit}    │", suit=card.suit);
+    println!("│         │");
+    println!("│         │");
+    if card.rank.to_string() == "10" {
+        println!("│      {rank} │", rank=card.rank);
+    } else {
+        println!("│     {rank}   │", rank=card.rank);
+    }
+    println!("└─────────┘");
+}
 fn main() {
     let deck = Deck::default();
 
